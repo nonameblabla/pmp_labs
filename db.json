@@ -1,26 +1,167 @@
 {
-    "popAlbums": [
-      { "title": "1989", "artist": "Taylor Swift", "cover": "url_to_taylor_cover" },
-      { "title": "Thank U, Next", "artist": "Ariana Grande", "cover": "url_to_grande_cover" },
-      { "title": "Future Nostalgia", "artist": "Dua Lipa", "cover": "url_to_dualipa_cover" },
-      { "title": "Born to Die", "artist": "Lana Del Rey", "cover": "url_to_lanochka_cover" }
-    ],
-    "rockAlbums": [
-      { "title": "A Night at the Opera", "artist": "Queen", "cover": "url_to_queen_cover" },
-      { "title": "IV", "artist": "Led Zeppelin", "cover": "url_to_led_zeppelin_cover" },
-      { "title": "Abbey Road", "artist": "The Beatles", "cover": "url_to_beatles_cover" },
-      { "title": "Nevermind", "artist": "Nirvana", "cover": "url_to_nirvana_cover" }
-    ],
-    "jazzAlbums": [
-      { "title": "Kind of Blue", "artist": "Miles Davis", "cover": "url_to_davis_cover" },
-      { "title": "A Love Supreme", "artist": "John Coltrane", "cover": "url_to_coltrane_cover" },
-      { "title": "What a Wonderful World", "artist": "Louis Armstrong", "cover": "url_to_armstrong_cover" },
-      { "title": "Money Jungle", "artist": "Duke Ellington", "cover": "url_to_ellington_cover" }
-    ],
-    "metalAlbums": [
-      { "title": "Kill 'Em All", "artist": "Metallica", "cover": "url_to_metallica_cover" },
-      { "title": "The Number of the Beast", "artist": "Iron Maiden", "cover": "url_to_maiden_cover" },
-      { "title": "Paranoid", "artist": "Black Sabbath", "cover": "url_to_sabbath_cover" },
-      { "title": "Iowa", "artist": "Slipknot", "cover": "url_to_slipknot_cover" }
-    ]
-  }  
+  "styles": {
+    "container": {
+      "flex": 1,
+      "backgroundColor": "#e0f7fa",
+      "paddingTop": 40,
+      "paddingHorizontal": 16,
+      "justifyContent": "center",
+      "alignItems": "center"
+    },
+    "header": {
+      "fontSize": 32,
+      "fontWeight": "bold",
+      "color": "#333",
+      "textAlign": "center",
+      "marginBottom": 30
+    },
+    "rowContainer": {
+      "flexDirection": "row",
+      "justifyContent": "space-between",
+      "width": "100%",
+      "marginBottom": 30
+    },
+    "buttonContainer": {
+      "alignItems": "center",
+      "width": "45%"
+    },
+    "genreButton": {
+      "width": "100%",
+      "height": 80,
+      "borderRadius": 20,
+      "backgroundColor": "#ff6f61",
+      "justifyContent": "center",
+      "alignItems": "center"
+    },
+    "icon": {
+      "width": 50,
+      "height": 50,
+      "flexShrink": 1
+    },
+    "genreLabel": {
+      "marginTop": 10,
+      "fontSize": 18,
+      "color": "#555"
+    },
+    "popContainer": {
+      "flex": 1,
+      "backgroundColor": "#fff7f0",
+      "paddingTop": 40,
+      "paddingHorizontal": 16,
+      "justifyContent": "center"
+    },
+    "popHeader": {
+      "fontSize": 32,
+      "fontWeight": "bold",
+      "color": "#ff6f61",
+      "textAlign": "center",
+      "marginBottom": 20
+    },
+    "albumCardPop": {
+      "backgroundColor": "#ffe0b2",
+      "borderRadius": 10,
+      "padding": 15,
+      "marginVertical": 10,
+      "alignItems": "center",
+      "shadowColor": "#000",
+      "shadowOffset": { "width": 0, "height": 2 },
+      "shadowOpacity": 0.3,
+      "shadowRadius": 4,
+      "elevation": 5
+    },
+    "albumCoverPop": {
+      "width": 100,
+      "height": 100,
+      "borderRadius": 10,
+      "marginBottom": 10
+    },
+    "albumTitle": {
+      "fontSize": 20,
+      "fontWeight": "bold",
+      "color": "#333",
+      "marginBottom": 5
+    },
+    "albumArtist": {
+      "fontSize": 16,
+      "color": "#777"
+    },
+    "rockContainer": {
+      "flex": 1,
+      "backgroundColor": "#f3e5f5",
+      "paddingTop": 40,
+      "paddingHorizontal": 16
+    },
+    "rockHeader": {
+      "fontSize": 32,
+      "fontWeight": "bold",
+      "color": "#4a148c",
+      "textAlign": "center",
+      "marginBottom": 20
+    },
+    "albumCardRock": {
+      "backgroundColor": "#ce93d8",
+      "borderRadius": 10,
+      "padding": 15,
+      "marginVertical": 10,
+      "alignItems": "center"
+    },
+    "albumCoverRock": {
+      "width": 100,
+      "height": 100,
+      "borderRadius": 10,
+      "marginBottom": 10
+    },
+    "jazzContainer": {
+      "flex": 1,
+      "backgroundColor": "#e0f2f1",
+      "paddingTop": 40,
+      "paddingHorizontal": 16
+    },
+    "jazzHeader": {
+      "fontSize": 32,
+      "fontWeight": "bold",
+      "color": "#00695c",
+      "textAlign": "center",
+      "marginBottom": 20
+    },
+    "albumCardJazz": {
+      "backgroundColor": "#b2dfdb",
+      "borderRadius": 10,
+      "padding": 15,
+      "marginVertical": 10,
+      "alignItems": "center"
+    },
+    "albumCoverJazz": {
+      "width": 100,
+      "height": 100,
+      "borderRadius": 10,
+      "marginBottom": 10
+    },
+    "metalContainer": {
+      "flex": 1,
+      "backgroundColor": "#eceff1",
+      "paddingTop": 40,
+      "paddingHorizontal": 16
+    },
+    "metalHeader": {
+      "fontSize": 32,
+      "fontWeight": "bold",
+      "color": "#37474f",
+      "textAlign": "center",
+      "marginBottom": 20
+    },
+    "albumCardMetal": {
+      "backgroundColor": "#b0bec5",
+      "borderRadius": 10,
+      "padding": 15,
+      "marginVertical": 10,
+      "alignItems": "center"
+    },
+    "albumCoverMetal": {
+      "width": 100,
+      "height": 100,
+      "borderRadius": 10,
+      "marginBottom": 10
+    }
+  }
+}
