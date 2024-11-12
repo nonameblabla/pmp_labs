@@ -1,30 +1,40 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React from 'react';
 import { Text, View, Button, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 
+const queryClient = new QueryClient();
 const Stack = createStackNavigator();
+//genres
 const musicIcon = require('./assets/music.png');
 const saxophoneIcon = require('./assets/saxophone.png');
 const guitarIcon = require('./assets/guitar.png');
 const electricGuitarIcon = require('./assets/electric-guitar.png');
-const grande = require('./assets/Ariana_Grande_Thank_U_Next.jpg');
-const taylor = require('./assets/Taylor_Swift_1989.png');
-const lanochka = require('./assets/Lana_Del_Rey_BornToDie.png');
-const dualipa = require('./assets/Dua_Lipa_Future_Nostalgia.png');
+//pop
+const PopCovers = {
+  'Thank U, Next': require('./assets/Ariana_Grande_Thank_U_Next.jpg'),
+  '1989': require('./assets/Taylor_Swift_1989.png'),
+  'Born to Die': require('./assets/Lana_Del_Rey_BornToDie.png'),
+  'Future Nostalgia': require('./assets/Dua_Lipa_Future_Nostalgia.png'),
+};
+//rock
 const queen = require('./assets/Queen.jpg');
 const nirvana = require('./assets/Nirvana.jpg');
 const led_zeppelin = require('./assets/Led_zeppelin.jpg');
 const beatles = require('./assets/Beatles.jpg');
+//jazz
 const Ellington = require('./assets/ellington.jpg');
 const Armstrong = require('./assets/Louis-Armstrong.jpg');
 const davis = require('./assets/miles_davis.jpg');
 const coltrane = require('./assets/John_Coltrane.jpeg');
+//metal
 const metallica = require('./assets/metallica.jpg');
 const maiden = require('./assets/iron_maiden.jpg');
 const sabbath = require('./assets/Black_Sabbath.png');
 const slipknot = require('./assets/slipknot.jpg');
 
+// Домашня сторінка
 function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
@@ -60,30 +70,35 @@ function HomeScreen({ navigation }) {
     </View>
   );
 }
-
 function PopPage({ navigation }) {
-  const [popAlbums, setPopAlbums] = useState([
-    { title: '1989', artist: 'Taylor Swift', cover: taylor },
-    { title: 'Thank U, Next', artist: 'Ariana Grande', cover: grande },
-    { title: 'Future Nostalgia', artist: 'Dua Lipa', cover: dualipa },
-    { title: 'Born to Die', artist: 'Lana Del Rey', cover: lanochka },
-  ]);
+  const { data: albums, isLoading, error } = useQuery({
+    queryKey: ['popAlbums'],
+    queryFn: async () => {
+      const response = await fetch('https://my-json-server.typicode.com/nonameblabla/pmp_labs/popAlbums');
+      const data = await response.json();
+      return data.map((album) => ({
+        ...album,
+        cover: PopCovers[album.title] || null,
+      }));
+    },
+  });
 
-  const memoizedAlbums = useMemo(() => popAlbums, [popAlbums]);
+  if (isLoading) return <Text>Завантаження...</Text>;
+  if (error) return <Text>Помилка: {error.message}</Text>;
 
   return (
     <View style={styles.popContainer}>
       <Text style={styles.popHeader}>Поп</Text>
       <FlatList
-        data={memoizedAlbums}
+        data={albums}
         renderItem={({ item }) => (
           <View style={styles.albumCardPop}>
-            <Image source={item.cover} style={styles.albumCoverPop} />
+            {item.cover && <Image source={item.cover} style={styles.albumCoverPop} />}
             <Text style={styles.albumTitle}>{item.title}</Text>
             <Text style={styles.albumArtist}>{item.artist}</Text>
           </View>
         )}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item) => item.id.toString()}
       />
       <Button title="Назад" onPress={() => navigation.navigate('Музичні підбірки')} />
     </View>
@@ -188,6 +203,7 @@ function MetalPage({ navigation }) {
 // Головна функція додатку
 export default function App() {
   return (
+    <QueryClientProvider client={queryClient}>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Музичні підбірки">
         <Stack.Screen name="Музичні підбірки" component={HomeScreen} />
@@ -197,6 +213,7 @@ export default function App() {
         <Stack.Screen name="Metal" component={MetalPage} />
       </Stack.Navigator>
     </NavigationContainer>
+    </QueryClientProvider>
   );
 }
 
@@ -228,26 +245,25 @@ const styles = StyleSheet.create({
   },
   genreButton: {
     width: '100%',
-    height: 80, 
+    height: 80,
     borderRadius: 20,
     backgroundColor: '#ff6f61',
     justifyContent: 'center',
     alignItems: 'center',
   },
   icon: {
-    width: 50,  
-    height: 50, 
-    flexShrink: 1, 
+    width: 50,
+    height: 50,
+    flexShrink: 1,
   },
   genreLabel: {
     marginTop: 10,
     fontSize: 18,
     color: '#555',
   },
-  //Pop
   popContainer: {
     flex: 1,
-    backgroundColor: '#fff7f0', 
+    backgroundColor: '#fff7f0',
     paddingTop: 40,
     paddingHorizontal: 16,
     justifyContent: 'center',
@@ -269,7 +285,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
-    elevation: 5, 
+    elevation: 5,
   },
   albumCoverPop: {
     width: 100,
