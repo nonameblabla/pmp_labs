@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Text, View, Button, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -61,20 +61,21 @@ function HomeScreen({ navigation }) {
   );
 }
 
-// Сторінка "Поп"
 function PopPage({ navigation }) {
-  const popAlbums = [
+  const [popAlbums, setPopAlbums] = useState([
     { title: '1989', artist: 'Taylor Swift', cover: taylor },
     { title: 'Thank U, Next', artist: 'Ariana Grande', cover: grande },
     { title: 'Future Nostalgia', artist: 'Dua Lipa', cover: dualipa },
-    { title:'Born to die', artist:'Lana del Rey', cover:lanochka},
-  ];
+    { title: 'Born to Die', artist: 'Lana Del Rey', cover: lanochka },
+  ]);
+
+  const memoizedAlbums = useMemo(() => popAlbums, [popAlbums]);
 
   return (
     <View style={styles.popContainer}>
       <Text style={styles.popHeader}>Поп</Text>
       <FlatList
-        data={popAlbums}
+        data={memoizedAlbums}
         renderItem={({ item }) => (
           <View style={styles.albumCardPop}>
             <Image source={item.cover} style={styles.albumCoverPop} />
@@ -89,20 +90,21 @@ function PopPage({ navigation }) {
   );
 }
 
-// Сторінка "Рок"
 function RockPage({ navigation }) {
-  const rockAlbums = [
+  const [rockAlbums, setRockAlbums] = useState([
     { title: 'A Night at the Opera', artist: 'Queen', cover: queen },
     { title: 'IV', artist: 'Led Zeppelin', cover: led_zeppelin },
     { title: 'Abbey Road', artist: 'The Beatles', cover: beatles },
     { title: 'Nevermind', artist: 'Nirvana', cover: nirvana },
-  ];
+  ]);
+
+  const memoizedRockAlbums = useMemo(() => rockAlbums, [rockAlbums]);
 
   return (
     <View style={styles.rockContainer}>
       <Text style={styles.rockHeader}>Рок</Text>
       <FlatList
-        data={rockAlbums}
+        data={memoizedRockAlbums}
         renderItem={({ item }) => (
           <View style={styles.albumCardRock}>
             <Image source={item.cover} style={styles.albumCoverRock} />
@@ -117,14 +119,21 @@ function RockPage({ navigation }) {
   );
 }
 
-// Сторінка "Джаз"
 function JazzPage({ navigation }) {
-  const jazzAlbums = [
+  const [jazzAlbums, setJazzAlbums] = useState([
     { title: 'Kind of Blue', artist: 'Miles Davis', cover: davis },
     { title: 'A Love Supreme', artist: 'John Coltrane', cover: coltrane },
-    { title: 'What a wonderful world', artist: 'Louis Armstrong', cover: Armstrong },
+    { title: 'What a Wonderful World', artist: 'Louis Armstrong', cover: Armstrong },
     { title: 'Money Jungle', artist: 'Duke Ellington', cover: Ellington },
-  ];
+  ]);
+
+  const fetchJazzAlbums = useCallback(() => {
+    setJazzAlbums([...jazzAlbums]);
+  }, [jazzAlbums]);
+
+  useEffect(() => {
+    fetchJazzAlbums();
+  }, [fetchJazzAlbums]);
 
   return (
     <View style={styles.jazzContainer}>
@@ -145,14 +154,17 @@ function JazzPage({ navigation }) {
   );
 }
 
-// Сторінка "Метал"
 function MetalPage({ navigation }) {
-  const metalAlbums = [
-    { title: 'Kill \'em All', artist: 'Metallica', cover: metallica },
+  const [metalAlbums, setMetalAlbums] = useState([
+    { title: "Kill 'Em All", artist: 'Metallica', cover: metallica },
     { title: 'The Number of the Beast', artist: 'Iron Maiden', cover: maiden },
     { title: 'Paranoid', artist: 'Black Sabbath', cover: sabbath },
     { title: 'Iowa', artist: 'Slipknot', cover: slipknot },
-  ];
+  ]);
+
+  useEffect(() => {
+    console.log('Metal albums updated');
+  }, [metalAlbums]);
 
   return (
     <View style={styles.metalContainer}>
@@ -177,7 +189,7 @@ function MetalPage({ navigation }) {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Music Charts">
+      <Stack.Navigator initialRouteName="Музичні підбірки">
         <Stack.Screen name="Музичні підбірки" component={HomeScreen} />
         <Stack.Screen name="Pop" component={PopPage} />
         <Stack.Screen name="Rock" component={RockPage} />
@@ -278,14 +290,14 @@ const styles = StyleSheet.create({
   // Рок
   rockContainer: {
     flex: 1,
-    backgroundColor: '#f3e5f5', // Фіолетові відтінки
+    backgroundColor: '#f3e5f5', 
     paddingTop: 40,
     paddingHorizontal: 16,
   },
   rockHeader: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#4a148c', // Глибокий фіолетовий для року
+    color: '#4a148c', 
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -305,14 +317,14 @@ const styles = StyleSheet.create({
   // Джаз
   jazzContainer: {
     flex: 1,
-    backgroundColor: '#e0f2f1', // Пастельні зелено-блакитні тони
+    backgroundColor: '#e0f2f1', 
     paddingTop: 40,
     paddingHorizontal: 16,
   },
   jazzHeader: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#00695c', // Темно-зелений для джазу
+    color: '#00695c', 
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -332,14 +344,14 @@ const styles = StyleSheet.create({
   // Метал
   metalContainer: {
     flex: 1,
-    backgroundColor: '#eceff1', // Сірі металічні тони
+    backgroundColor: '#eceff1', 
     paddingTop: 40,
     paddingHorizontal: 16,
   },
   metalHeader: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#37474f', // Темний металічний
+    color: '#37474f', 
     textAlign: 'center',
     marginBottom: 20,
   },
