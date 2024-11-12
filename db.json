@@ -1,16 +1,8 @@
 {
-  "albums": [
-    { "id": 1, "title": "1989", "artist": "Taylor Swift", "genre": "pop" },
-    { "id": 2, "title": "Thank U, Next", "artist": "Ariana Grande", "genre": "pop" },
-    { "id": 3, "title": "A Night at the Opera", "artist": "Queen", "genre": "rock" },
-    { "id": 4, "title": "IV", "artist": "Led Zeppelin", "genre": "rock" },
-    { "id": 5, "title": "Kind of Blue", "artist": "Miles Davis", "genre": "jazz" },
-    { "id": 6, "title": "Kill 'Em All", "artist": "Metallica", "genre": "metal" }
-  ],
-  "statistics": {
-    "pop": { "albumCount": 4, "listeners": 150000 },
-    "rock": { "albumCount": 4, "listeners": 200000 },
-    "jazz": { "albumCount": 4, "listeners": 100000 },
-    "metal": { "albumCount": 4, "listeners": 120000 }
-  }
+  "popAlbums": [
+    { "id": 1, "title": "1989", "artist": "Taylor Swift" },
+    { "id": 2, "title": "Thank U, Next", "artist": "Ariana Grande" },
+    { "id": 3, "title": "Future Nostalgia", "artist": "Dua Lipa" },
+    { "id": 4, "title": "Born to Die", "artist": "Lana Del Rey" }
+  ]
 }
