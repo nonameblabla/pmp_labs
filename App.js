@@ -1,16 +1,13 @@
-import React from 'react';
+import React, {useState, useMemo, useEffect} from 'react';
 import { Text, View, Button, FlatList, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 
+import * as SQLite from 'expo-sqlite' 
+
 const queryClient = new QueryClient();
 const Stack = createStackNavigator();
-//genres
-const musicIcon = require('./assets/music.png');
-const saxophoneIcon = require('./assets/saxophone.png');
-const guitarIcon = require('./assets/guitar.png');
-const electricGuitarIcon = require('./assets/electric-guitar.png');
 //pop
 const PopCovers = {
   'Thank U, Next': require('./assets/Ariana_Grande_Thank_U_Next.jpg'),
@@ -19,22 +16,65 @@ const PopCovers = {
   'Future Nostalgia': require('./assets/Dua_Lipa_Future_Nostalgia.png'),
 };
 //rock
-const queen = require('./assets/Queen.jpg');
-const nirvana = require('./assets/Nirvana.jpg');
-const led_zeppelin = require('./assets/Led_zeppelin.jpg');
-const beatles = require('./assets/Beatles.jpg');
+import {rock} from './assets/imports'
+const {beatles, nirvana, queen, led_zeppelin} = rock;
 //jazz
-const Ellington = require('./assets/ellington.jpg');
-const Armstrong = require('./assets/Louis-Armstrong.jpg');
-const davis = require('./assets/miles_davis.jpg');
-const coltrane = require('./assets/John_Coltrane.jpeg');
+import {jazz} from './assets/imports'
+const {Armstrong, coltrane, Ellington, davis} = jazz;
 //metal
-const metallica = require('./assets/metallica.jpg');
-const maiden = require('./assets/iron_maiden.jpg');
-const sabbath = require('./assets/Black_Sabbath.png');
-const slipknot = require('./assets/slipknot.jpg');
+import {metal} from './assets/imports'
+const {metallica, maiden, sabbath, slipknot} = metal;
 
-// Домашня сторінка
+const genreAlbums = {
+  rock: [
+    { title: 'A Night at the Opera', artist: 'Queen' },
+    { title: 'IV', artist: 'Led Zeppelin' },
+    { title: 'Abbey Road', artist: 'The Beatles' },
+    { title: 'Nevermind', artist: 'Nirvana' }
+  ],
+  jazz: [
+    { title: 'Kind of Blue', artist: 'Miles Davis' },
+    { title: 'A Love Supreme', artist: 'John Coltrane' },
+    { title: 'What a Wonderful World', artist: 'Louis Armstrong' },
+    { title: 'Money Jungle', artist: 'Duke Ellington' }
+  ],
+  metal: [
+    { title: 'Master of Puppets', artist: 'Metallica' },
+    { title: 'The Number of the Beast', artist: 'Iron Maiden' },
+    { title: 'Paranoid', artist: 'Black Sabbath' },
+    { title: 'Iowa', artist: 'Slipknot' }
+  ]
+};
+
+//збереження даних у базу
+const saveAlbumsToDb = (db) => {
+  Object.keys(genreAlbums).forEach((genre) => {
+    genreAlbums[genre].forEach(({ title, artist }) => {
+      db.transaction((tx) => {
+        tx.executeSql(
+          'INSERT INTO Albums (title, artist, genre) VALUES (?, ?, ?)',
+          [title, artist, genre],
+          null,
+          (txObj, error) => console.log('Помилка запису:', error)
+        );
+      });
+    });
+  });
+};
+//отримання альбомів
+const fetchAlbums = (db, genre, setAlbums) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      'SELECT * FROM Albums WHERE genre = ?',
+      [genre],
+      (txObj, resultSet) => setAlbums(resultSet.rows._array),
+      (txObj, error) => console.log('Помилка вибірки:', error)
+    );
+  });
+};
+
+
+//Домашня сторінка
 function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
@@ -105,21 +145,20 @@ function PopPage({ navigation }) {
   );
 }
 
+//
 function RockPage({ navigation }) {
-  const [rockAlbums, setRockAlbums] = useState([
-    { title: 'A Night at the Opera', artist: 'Queen', cover: queen },
-    { title: 'IV', artist: 'Led Zeppelin', cover: led_zeppelin },
-    { title: 'Abbey Road', artist: 'The Beatles', cover: beatles },
-    { title: 'Nevermind', artist: 'Nirvana', cover: nirvana },
-  ]);
+  const [rockAlbums, setRockAlbums] = useState([]);
+  const [db, setDb] = useState(null);
 
-  const memoizedRockAlbums = useMemo(() => rockAlbums, [rockAlbums]);
+  useEffect(() => {
+    if (db) fetchAlbums(db, 'rock', setRockAlbums);
+  }, [db]);
 
   return (
     <View style={styles.rockContainer}>
       <Text style={styles.rockHeader}>Рок</Text>
       <FlatList
-        data={memoizedRockAlbums}
+        data={rockAlbums}
         renderItem={({ item }) => (
           <View style={styles.albumCardRock}>
             <Image source={item.cover} style={styles.albumCoverRock} />
@@ -127,7 +166,7 @@ function RockPage({ navigation }) {
             <Text style={styles.albumArtist}>{item.artist}</Text>
           </View>
         )}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item) => item.id.toString()}
       />
       <Button title="Назад" onPress={() => navigation.navigate('Музичні підбірки')} />
     </View>
@@ -135,20 +174,12 @@ function RockPage({ navigation }) {
 }
 
 function JazzPage({ navigation }) {
-  const [jazzAlbums, setJazzAlbums] = useState([
-    { title: 'Kind of Blue', artist: 'Miles Davis', cover: davis },
-    { title: 'A Love Supreme', artist: 'John Coltrane', cover: coltrane },
-    { title: 'What a Wonderful World', artist: 'Louis Armstrong', cover: Armstrong },
-    { title: 'Money Jungle', artist: 'Duke Ellington', cover: Ellington },
-  ]);
-
-  const fetchJazzAlbums = useCallback(() => {
-    setJazzAlbums([...jazzAlbums]);
-  }, [jazzAlbums]);
+  const [jazzAlbums, setJazzAlbums] = useState([]);
+  const [db, setDb] = useState(null);
 
   useEffect(() => {
-    fetchJazzAlbums();
-  }, [fetchJazzAlbums]);
+    if (db) fetchAlbums(db, 'jazz', setJazzAlbums);
+  }, [db]);
 
   return (
     <View style={styles.jazzContainer}>
@@ -162,7 +193,7 @@ function JazzPage({ navigation }) {
             <Text style={styles.albumArtist}>{item.artist}</Text>
           </View>
         )}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item) => item.id.toString()}
       />
       <Button title="Назад" onPress={() => navigation.navigate('Музичні підбірки')} />
     </View>
@@ -170,16 +201,12 @@ function JazzPage({ navigation }) {
 }
 
 function MetalPage({ navigation }) {
-  const [metalAlbums, setMetalAlbums] = useState([
-    { title: "Kill 'Em All", artist: 'Metallica', cover: metallica },
-    { title: 'The Number of the Beast', artist: 'Iron Maiden', cover: maiden },
-    { title: 'Paranoid', artist: 'Black Sabbath', cover: sabbath },
-    { title: 'Iowa', artist: 'Slipknot', cover: slipknot },
-  ]);
+  const [metalAlbums, setMetalAlbums] = useState([]);
+  const [db, setDb] = useState(null);
 
   useEffect(() => {
-    console.log('Metal albums updated');
-  }, [metalAlbums]);
+    if (db) fetchAlbums(db, 'metal', setMetalAlbums);
+  }, [db]);
 
   return (
     <View style={styles.metalContainer}>
@@ -193,26 +220,46 @@ function MetalPage({ navigation }) {
             <Text style={styles.albumArtist}>{item.artist}</Text>
           </View>
         )}
-        keyExtractor={(item, index) => index.toString()}
+        keyExtractor={(item) => item.id.toString()}
       />
       <Button title="Назад" onPress={() => navigation.navigate('Музичні підбірки')} />
     </View>
   );
 }
 
-// Головна функція додатку
 export default function App() {
+  const [db, setDb] = useState(null);
+
+  useEffect(() => {
+    const database = SQLite.openDatabase('lmao.db');
+    setDb(database);
+
+    database.transaction((tx) => {
+      tx.executeSql(
+        "CREATE TABLE IF NOT EXISTS Albums (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT, artist TEXT, genre TEXT)"
+      );
+    });
+
+    saveAlbumsToDb(database);
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Музичні підбірки">
-        <Stack.Screen name="Музичні підбірки" component={HomeScreen} />
-        <Stack.Screen name="Pop" component={PopPage} />
-        <Stack.Screen name="Rock" component={RockPage} />
-        <Stack.Screen name="Jazz" component={JazzPage} />
-        <Stack.Screen name="Metal" component={MetalPage} />
-      </Stack.Navigator>
-    </NavigationContainer>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Музичні підбірки">
+          <Stack.Screen name="Музичні підбірки" component={HomeScreen} />
+          <Stack.Screen name="Pop" component={PopPage} />
+          <Stack.Screen name="Rock">
+            {(props) => <RockPage {...props} db={db} />}
+          </Stack.Screen>
+          <Stack.Screen name="Jazz">
+            {(props) => <JazzPage {...props} db={db} />}
+          </Stack.Screen>
+          <Stack.Screen name="Metal">
+            {(props) => <MetalPage {...props} db={db} />}
+          </Stack.Screen>
+        </Stack.Navigator>
+      </NavigationContainer>
     </QueryClientProvider>
   );
 }
