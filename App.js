@@ -6,6 +6,8 @@ import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-quer
 
 import * as SQLite from 'expo-sqlite' 
 
+import * as Haptics from 'expo-haptics';
+
 const queryClient = new QueryClient();
 const Stack = createStackNavigator();
 //pop
@@ -140,7 +142,13 @@ function PopPage({ navigation }) {
         )}
         keyExtractor={(item) => item.id.toString()}
       />
-      <Button title="Назад" onPress={() => navigation.navigate('Музичні підбірки')} />
+      <Button
+        title="Назад"
+        onPress={() => {
+          Haptics.selectionAsync(); //Виклик вібрації при натисканні
+          navigation.navigate('Музичні підбірки');
+        }}
+      />
     </View>
   );
 }
@@ -168,8 +176,13 @@ function RockPage({ navigation }) {
         )}
         keyExtractor={(item) => item.id.toString()}
       />
-      <Button title="Назад" onPress={() => navigation.navigate('Музичні підбірки')} />
-    </View>
+      <Button
+        title="Назад"
+        onPress={() => {
+          Haptics.selectionAsync(); //Виклик вібрації при натисканні
+          navigation.navigate('Музичні підбірки');
+        }}
+      />    </View>
   );
 }
 
@@ -195,8 +208,13 @@ function JazzPage({ navigation }) {
         )}
         keyExtractor={(item) => item.id.toString()}
       />
-      <Button title="Назад" onPress={() => navigation.navigate('Музичні підбірки')} />
-    </View>
+      <Button
+        title="Назад"
+        onPress={() => {
+          Haptics.selectionAsync(); //Виклик вібрації при натисканні
+          navigation.navigate('Музичні підбірки');
+        }}
+      />    </View>
   );
 }
 
@@ -222,8 +240,13 @@ function MetalPage({ navigation }) {
         )}
         keyExtractor={(item) => item.id.toString()}
       />
-      <Button title="Назад" onPress={() => navigation.navigate('Музичні підбірки')} />
-    </View>
+      <Button
+        title="Назад"
+        onPress={() => {
+          Haptics.selectionAsync(); //Виклик вібрації при натисканні
+          navigation.navigate('Музичні підбірки');
+        }}
+      />    </View>
   );
 }
 
